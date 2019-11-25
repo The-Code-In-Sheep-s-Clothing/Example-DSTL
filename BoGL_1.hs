@@ -90,9 +90,9 @@ OPTIONAL (functions are predefined but can be overwritten)
 data Game = G {
      -- required
      initial  :: State,
-     gameOver :: State -> Bool,
      outcome  :: State -> Status,
      -- optional
+     gameOver :: State -> Bool,
      input    :: State -> String -> Position,
      output   :: Content -> String,
      isValid  :: Position -> State -> Bool,
@@ -105,11 +105,11 @@ game :: Game
 game = G {
   -- required
   initial  = undefined,
-  gameOver = undefined,
   outcome  = undefined,
   -- optional
   input    = \_ -> read,   -- ignore state
   output   = show,
+  gameOver = isFull,
   isValid  = \p (b,_) -> b!p == Empty,
   turn     = \p (b,x) -> (place x p b,switch x)
 }
