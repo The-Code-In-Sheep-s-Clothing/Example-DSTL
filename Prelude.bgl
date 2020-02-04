@@ -1,0 +1,35 @@
+--
+-- General game definitions
+--
+
+-- Players
+--
+goFirst : Player
+goFirst = A
+
+next : Player -> Player
+next(A) = B
+next(B) = A
+
+
+-- Initial board and board operations
+--
+initialBoard : Board
+initialBoard(x,y) = Empty
+
+isValid : (Board,Position) -> Bool
+isValid(b,p) = if b!p == Empty then True else False
+
+
+-- Game state operations
+--
+tryMove : (Player,Board) -> (Board,Player)
+tryMove(p,b) = let pos = input in
+                   if isValid(b,pos) then (place(p,b,pos),next(p))
+                                     else (b,p)
+
+loop : (Player,Board) -> (Player,Board)
+loop(p,b) = while not(gameOver(b)) do tryMove(p,b)
+
+play : (Player,Board) -> Player|Tie
+play(a,b) = outcome(loop(a,b))

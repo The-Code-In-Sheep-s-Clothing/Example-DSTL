@@ -1,0 +1,40 @@
+game TicTacToe
+
+
+-- Board and input type definitions
+--
+type Board = Array (3,3) of Player|Empty
+type Input = Position
+
+
+-- Prelude.bgl provides the following definitions for players, boards, and state
+--
+-- goFirst : Player
+-- next    : Player -> Player
+--
+-- initialBoard : Board
+-- isValid      : (Board,Position) -> Bool
+--
+-- tryMove : (Player,Board) -> (Board,Player)
+-- loop    : (Player,Board) -> (Player,Board)
+-- play    : (Player,Board) -> Player|Tie
+
+
+-- Game ending: game-over condition and game outcome
+--
+gameOver : Board -> Bool
+gameOver(b) = or(threeInARow(b),isFull(b))
+
+outcome : (Board,Player) -> Player|Tie
+outcome(b,p) = if inARow(3,A,b) then A else
+               if inARow(3,B,b) then B else
+               if isFull(b)     then Tie
+
+threeInARow : Board -> Bool
+threeInARow(b) = or(inARow(3,A,b),inARow(3,B,b))
+
+
+-- Result of playing the game
+--
+result : Player|Tie
+result = play(initialBoard,goFirst)
