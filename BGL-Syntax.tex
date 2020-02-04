@@ -67,8 +67,7 @@ constants, respectively.
 %
 Comments are also handled as in Haskell.
 
-A game definition consists of a name, two type definitions for the game board
-and the player inputs, and a number of value and function definitions.
+A game definition consists of a name, two mandatory type definitions for the board and player inputs, and any number of value and function definitions.
 %
 The board definition determines the board dimensions and the type of values
 contained on a board.
@@ -76,7 +75,7 @@ contained on a board.
 \syntax{Games and Type Definitions}{
 \nt{game}   \IS  \prog{game}\ \nt{Name}\ \nt{board}\ \nt{input}\ \nt{valdef}
                                                      \prodName{game definition}
-\nt{board}  \IS  \prog{type Board = Grid}\pair{\nt{int}}{\nt{int}}\
+\nt{board}  \IS  \prog{type Board = Array }\pair{\nt{int}}{\nt{int}}\
                  \prog{of}\ \nt{type}                \prodName{board type}
 \nt{input}  \IS  \prog{type Input =}\ \nt{type}      \prodName{input type}
 }
@@ -86,15 +85,12 @@ their type plus an equation for defining the value. If a value is
 parameterized, that is, if it is followed by a parameter list, it represents a
 function.
 
-A board definition (for a \nt{name} with declared type \prog{Board}) is similar
-to a function definition and may contain a number of definitions for individual
-positions and definitions for board regions, which can be given by expressions
-denoting a collection of positions.
-%
-A board (that is any value of type \prog{Board}) can be though of as a mapping,
-that is, an extensionally defined function, and it can be applied like a
-function, which then corresponds to a lookup of the content on the board at the
-particular position.
+A board definition (for a variable \nt{name} with declared type \prog{Board})
+is equivalent to an array definition and may contain a number of definitions
+for individual positions (given by pairs of integers) and for sets of
+positions, which can be given by using a variable for either or both
+coordinates. The semantics of a definition such as \prog{board(x,2) = Empty} is
+to set all fields in the second row to \prog{Empty}.
 
 \syntax{Value Definitions}{
 \nt{valdef}    \IS \nt{signature}\ \nt{equation}   \prodName{definition}
@@ -103,10 +99,9 @@ particular position.
                \OR \nt{name}\ \nt{parlist}\ \prog{=}\ \nt{expr}
                    \prodName{function equation}
                \OR \nt{boardequ}^*                  \prodName{board equation}
-\nt{boardequ}  \IS \nt{name}\pair{\nt{int}}{\nt{int}}\ \prog{=}\ \nt{expr}
-                   \prodName{position definition}
-               \OR \nt{name}\paren{\nt{expr}}\ \prog{=}\ \nt{expr}
-                   \prodName{region definition}
+\nt{boardequ}  \IS \nt{name}\pair{\nt{pos}}{\nt{pos}}\ \prog{=}\ \nt{expr}
+                   \prodName{board definition}
+\nt{pos}       \IS \nt{int} \ORil \nt{name}      \prodName{board positions}
 \nt{parlist} \IS \paren{\nt{name}_1\prog{,}\ \ldots\ \prog{,}\nt{name}_k}
                  \prodName{parameter list, $k\geq 1$}
 }
@@ -123,7 +118,7 @@ those, the type \prog{Position} is a synonym for \prog{(Int,Int)}. The type
 \prog{Positions} is an abstract data type for collections of positions, which
 can be though of as sets or lists of positions. However, the underlying
 representation is not exposed to the programmer. A value of type
-\prog{Positions} can only be generated and manipulated by s number of
+\prog{Positions} can only be generated and manipulated by a number of
 predefined operations.
 
 Extended types extend a base type by one or more symbols, which are values and
@@ -158,11 +153,15 @@ argument and result types can be any plain type.
 Atomic expressions are either basic integer or string values or symbols. Note
 that symbols include the predefined values \prog{A} and \prog{B} of type
 \prog{Player} plus a number of predefined operations.
+%
+Not that the case for infix application includes the Haskell notation for array
+lookup \prog{board!(x,y)}.
 
 \syntax{Expressions}{
 \nt{expr}     \IS  \nt{int}                                 \prodName{integer}
               \OR  \nt{string}                               \prodName{string}
               \OR  \nt{Name}                                 \prodName{symbol}
+              \OR  \nt{name}                               \prodName{variable}
             % \OR  \prog{A} \ORil \prog{B}                   \prodName{player}
               \OR  \paren{\nt{expr}}       \prodName{parenthesized expression}
               \OR  \paren{\nt{expr}_1\prog{,}\ \ldots\ \prog{,}\nt{expr}_k}
@@ -182,7 +181,8 @@ that symbols include the predefined values \prog{A} and \prog{B} of type
               \OR  \prog{while}\ \nt{expr}\ \prog{do}\ \nt{expr}
                                                          \prodName{while loop}
 %
-\nt{binop}    \IS  \prog{+} \ORil \prog{-} \ORil \prog{==} \ORil \ldots
+\nt{binop}    \IS  \prog{+} \ORil \prog{-} \ORil
+                   \prog{==} \ORil \prog{!} \ORil \ldots
                                                    \prodName{binary operation}
 }
 %
@@ -198,10 +198,6 @@ that symbols include the predefined values \prog{A} and \prog{B} of type
 Here are several predefined operations and values and their types. This list is preliminary and is likely to change.
 
 \begin{verbatim}
--- Positions
-positions : Positions
-free      : Board -> Positions
-
 -- User input
 input : Input
 
@@ -210,6 +206,7 @@ place : (Symbol,Board,Position) -> Board
 next  : Player -> Player
 
 -- Board predicates
+free   : Board -> Positions
 isFull : Board -> Bool
 isFull(b) = countBoard(Empty,b) == 0
 
@@ -220,13 +217,10 @@ countColumn : (Symbol,Board,Int) -> Int
 \end{verbatim}
 
 
-
 % \syntax{Auxiliary Definitions}{
 % \nt{parlist} \IS \paren{\nt{name}_1\prog{,}\ \ldots\ \prog{,}\nt{name}_k}
 %                  \prodName{parameter list, $k>1$}
 % }
-
-
 
 
 \end{document}

@@ -3,14 +3,14 @@ game TicTacToe
 
 -- Board and input type definitions
 --
-type Board = Grid(3,3) of Player|Empty
+type Board = Array (3,3) of Player|Empty
 type Input = Position
 
 
 -- Game setup
 --
 initialBoard : Board
-initialBoard(positions) = Empty
+initialBoard(x,y) = Empty
 
 goFirst : Player
 goFirst = A
@@ -33,7 +33,7 @@ threeInARow(b) = or(inARow(3,A,b),inARow(3,B,b))
 -- Predefined operations
 --
 isValid : (Board,Position) -> Bool
-isValid(b,p) = if b(p) == Empty then True else False
+isValid(b,p) = if b!p == Empty then True else False
 
 
 -- Game loop

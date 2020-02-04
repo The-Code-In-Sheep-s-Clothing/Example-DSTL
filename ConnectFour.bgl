@@ -3,7 +3,7 @@ game ConnectFour
 
 -- Board and input type definitions
 --
-type Board = Grid(6,7) of Player|Empty
+type Board = Array (6,7) of Player|Empty
 type Input = Int
 
 -- We need to convert column input into positions
@@ -15,7 +15,7 @@ col2pos(b,c) = (7-countColumn(Empty,b,c),c)
 -- Game setup
 --
 initialBoard : Board
-initialBoard(positions) = Empty
+initialBoard(x,y) = Empty
 
 goFirst : Player
 goFirst = A
@@ -38,7 +38,7 @@ fourInARow(b) = or(inARow(4,A,b),inARow(4,B,b))
 -- Predefined operations
 --
 isValid : (Board,Position) -> Bool
-isValid(b,p) = if b(p) == Empty then True else False
+isValid(b,p) = if b!p == Empty then True else False
 
 
 -- Game loop
