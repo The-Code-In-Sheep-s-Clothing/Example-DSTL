@@ -17,14 +17,14 @@ type Input = Position
 -- initialBoard : Board
 -- isValid      : (Board,Position) -> Bool
 --
--- tryMove : (Player,Board) -> (Board,Player)
--- loop    : (Player,Board) -> (Player,Board)
--- play    : (Player,Board) -> Player|Tie
+-- tryMove : State -> State
+-- loop    : State -> State
+-- play    : State -> Player|Tie
 
 
 -- Game ending: game-over condition and game outcome
 --
-gameOver : Board -> Bool
+gameOver : State -> Bool
 gameOver(b,p) = or(threeInARow(b),isFull(b))
 
 outcome : State -> Player|Tie
