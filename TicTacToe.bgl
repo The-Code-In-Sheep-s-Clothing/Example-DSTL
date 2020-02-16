@@ -6,6 +6,8 @@ game TicTacToe
 type Board = Array (3,3) of Player|Empty
 type Input = Position
 
+type State = (Board,Player)
+
 
 -- Game setup
 --
@@ -19,9 +21,9 @@ goFirst = A
 -- Game ending: game-over condition and game outcome
 --
 gameOver : Board -> Bool
-gameOver(b) = or(threeInARow(b),isFull(b))
+gameOver(b,p) = or(threeInARow(b),isFull(b))
 
-outcome : (Board,Player) -> Player|Tie
+outcome : State -> Player|Tie
 outcome(b,p) = if inARow(3,A,b) then A else
                if inARow(3,B,b) then B else
                if isFull(b)     then Tie
@@ -38,15 +40,15 @@ isValid(b,p) = if b!p == Empty then True else False
 
 -- Game loop
 --
-tryMove : (Player,Board) -> (Board,Player)
-tryMove(p,b) = let pos = input in
+tryMove : State -> State
+tryMove(b,p) = let pos = input in
                    if isValid(b,pos) then (place(p,b,pos),next(p))
                                      else (b,p)
 
-loop : (Player,Board) -> (Player,Board)
-loop(p,b) = while not(gameOver(b)) do tryMove(p,b)
+loop : State -> State
+loop(p,b) = while not(gameOver(p,b)) do tryMove(p,b)
 
-play : (Player,Board) -> Player|Tie
+play : State -> Player|Tie
 play(a,b) = outcome(loop(a,b))
 -- play(a,b) = outcome(while not(gameOver(b)) do tryMove(p,b))
 

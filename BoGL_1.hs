@@ -109,7 +109,7 @@ game = G {
   -- optional
   input    = \_ -> read,   -- ignore state
   output   = show,
-  gameOver = isFull,
+  gameOver = isFull . fst,
   isValid  = \p (b,_) -> b!p == Empty,
   turn     = \p (b,x) -> (place x p b,switch x)
 }

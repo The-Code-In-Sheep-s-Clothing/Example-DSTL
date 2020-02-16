@@ -1,6 +1,8 @@
 --
 -- General game definitions
 --
+type State = (Board,Player)
+
 
 -- Players
 --
@@ -23,13 +25,13 @@ isValid(b,p) = if b!p == Empty then True else False
 
 -- Game state operations
 --
-tryMove : (Player,Board) -> (Board,Player)
+tryMove : State -> State
 tryMove(p,b) = let pos = input in
                    if isValid(b,pos) then (place(p,b,pos),next(p))
                                      else (b,p)
 
-loop : (Player,Board) -> (Player,Board)
+loop : State -> State
 loop(p,b) = while not(gameOver(b)) do tryMove(p,b)
 
-play : (Player,Board) -> Player|Tie
+play : State -> Player|Tie
 play(a,b) = outcome(loop(a,b))

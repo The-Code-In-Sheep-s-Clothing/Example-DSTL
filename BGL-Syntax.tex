@@ -102,8 +102,9 @@ to set all fields in the second row to \prog{Empty}.
 \nt{boardequ}  \IS \nt{name}\pair{\nt{pos}}{\nt{pos}}\ \prog{=}\ \nt{expr}
                    \prodName{board definition}
 \nt{pos}       \IS \nt{int} \ORil \nt{name}      \prodName{board positions}
-\nt{parlist} \IS \paren{\nt{name}_1\prog{,}\ \ldots\ \prog{,}\nt{name}_k}
-                 \prodName{parameter list, $k\geq 1$}
+\nt{parlist}   \IS \paren{\nt{par}_1\prog{,}\ \ldots\ \prog{,}\nt{par}_k}
+                   \prodName{parameter list, $k\geq 1$}
+\nt{pos}       \IS \nt{name} \ORil \nt{parlist}   \prodName{parameter}
 }
 %
 The types system builds on a collection of basic types, which include
