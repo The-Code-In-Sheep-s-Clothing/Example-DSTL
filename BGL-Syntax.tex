@@ -48,7 +48,7 @@
 
 \begin{document}
 
-\title{BGL Syntax}
+\title{BoGL Syntax}
 \author{Martin Erwig}
 \maketitle
 
@@ -73,11 +73,13 @@ The board definition determines the board dimensions and the type of values
 contained on a board.
 
 \syntax{Games and Type Definitions}{
-\nt{game}   \IS  \prog{game}\ \nt{Name}\ \nt{board}\ \nt{input}\ \nt{valdef}
+\nt{game}    \IS  \prog{game}\ \nt{Name}\ \nt{board}\ \nt{input}
+                  \ \nt{typedef}^*\ \nt{valuedef}^*
                                                      \prodName{game definition}
-\nt{board}  \IS  \prog{type Board = Array }\pair{\nt{int}}{\nt{int}}\
-                 \prog{of}\ \nt{type}                \prodName{board type}
-\nt{input}  \IS  \prog{type Input =}\ \nt{type}      \prodName{input type}
+\nt{board}   \IS  \prog{type Board = Array }\pair{\nt{int}}{\nt{int}}\
+                  \prog{of}\ \nt{type}                \prodName{board type}
+\nt{input}   \IS  \prog{type Input = }\nt{type}      \prodName{input type}
+\nt{typedef} \IS  \prog{type }\nt{Name}\prog{ = }\nt{type}      \prodName{type definition}
 }
 %
 Value definitions (for values and functions) require a signature declaring
@@ -93,18 +95,18 @@ coordinates. The semantics of a definition such as \prog{board(x,2) = Empty} is
 to set all fields in the second row to \prog{Empty}.
 
 \syntax{Value Definitions}{
-\nt{valdef}    \IS \nt{signature}\ \nt{equation}   \prodName{definition}
+\nt{valuedef}  \IS \nt{signature}\ \nt{equation}   \prodName{value definition}
 \nt{signature} \IS \nt{name}\ \prog{:}\ \nt{type}  \prodName{type signature}
 \nt{equation}  \IS \nt{name}\ \prog{=}\ \nt{expr}  \prodName{value equation}
                \OR \nt{name}\ \nt{parlist}\ \prog{=}\ \nt{expr}
                    \prodName{function equation}
-               \OR \nt{boardequ}^*                  \prodName{board equation}
-\nt{boardequ}  \IS \nt{name}\pair{\nt{pos}}{\nt{pos}}\ \prog{=}\ \nt{expr}
-                   \prodName{board definition}
+               \OR \nt{boarddef}^*                  \prodName{board definition}
+\nt{boarddef}  \IS \nt{name}\,\prog{!}\,\pair{\nt{pos}}{\nt{pos}}\ \prog{=}\ \nt{expr}
+                   \prodName{board equation}
 \nt{pos}       \IS \nt{int} \ORil \nt{name}      \prodName{board positions}
 \nt{parlist}   \IS \paren{\nt{par}_1\prog{,}\ \ldots\ \prog{,}\nt{par}_k}
                    \prodName{parameter list, $k\geq 1$}
-\nt{pos}       \IS \nt{name} \ORil \nt{parlist}   \prodName{parameter}
+\nt{par}       \IS \nt{name} \ORil \nt{parlist}   \prodName{parameter}
 }
 %
 The types system builds on a collection of basic types, which include
