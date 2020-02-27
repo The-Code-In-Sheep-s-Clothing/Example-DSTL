@@ -137,7 +137,7 @@ argument and result types can be any plain type.
 
 \syntax{Types}{
 \nt{btype}    \IS  \prog{Bool} \ORil \prog{Int} \ORil
-                   \prog{Symbol} \ORil \prog{Input}
+                   \prog{Symbol} \ORil \prog{Input} \ORil \prog{Void}
                                                          \prodName{atomic type}
               \OR  \prog{Board} \ORil \prog{Player} \ORil
                    \prog{Position} \ORil \prog{Positions}
@@ -162,7 +162,6 @@ lookup \prog{board!(x,y)}.
 
 \syntax{Expressions}{
 \nt{expr}     \IS  \nt{int}                                 \prodName{integer}
-              \OR  \nt{string}                               \prodName{string}
               \OR  \nt{Name}                                 \prodName{symbol}
               \OR  \nt{name}                               \prodName{variable}
             % \OR  \prog{A} \ORil \prog{B}                   \prodName{player}
