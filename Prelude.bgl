@@ -1,6 +1,7 @@
 --
 -- General game definitions
 --
+type Player = Void | A | B
 type State = (Board,Player)
 
 
