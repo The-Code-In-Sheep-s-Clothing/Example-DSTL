@@ -54,7 +54,7 @@
 
 \noindent
 %
-We generally adopt the Haskell rules for lexical syntax, in particular,
+We generally adopt the Haskell rules for lexical syntax. In particular,
 \nt{name} is used for function and parameter names and stands for alphanumeric
 strings starting with a lowercase letter.
 %
@@ -62,15 +62,16 @@ Similarly, \nt{Name} is used for symbols (which are basically nullary
 constructors) and stands for alphanumeric strings starting with an uppercase
 letter. It is also used for the names of games.
 %
-The nonterminals \nt{int} and \nt{string} stand for integer and string
-constants, respectively.
+The nonterminal \nt{int} stands for integer constants.
 %
 Comments are also handled as in Haskell.
 
-A game definition consists of a name, two mandatory type definitions for the board and player inputs, and any number of value and function definitions.
+A game definition consists of a name, two mandatory type definitions for the
+board and player inputs, any number of additional type definitions, followed by
+any number of value and function definitions.
 %
 The board definition determines the board dimensions and the type of values
-contained on a board.
+that can appear on a board.
 
 \syntax{Games and Type Definitions}{
 \nt{game}    \IS  \prog{game}\ \nt{Name}\ \nt{board}\ \nt{input}
@@ -91,8 +92,8 @@ A board definition (for a variable \nt{name} with declared type \prog{Board})
 is equivalent to an array definition and may contain a number of definitions
 for individual positions (given by pairs of integers) and for sets of
 positions, which can be given by using a variable for either or both
-coordinates. The semantics of a definition such as \prog{board(x,2) = Empty} is
-to set all fields in the second row to \prog{Empty}.
+coordinates. The semantics of a definition such as \prog{board!(x,2)~=~Empty}
+is to set all fields in the second row to \prog{Empty}.
 
 \syntax{Value Definitions}{
 \nt{valuedef}  \IS \nt{signature}\ \nt{equation}   \prodName{value definition}
@@ -109,27 +110,30 @@ to set all fields in the second row to \prog{Empty}.
 \nt{par}       \IS \nt{name} \ORil \nt{parlist}   \prodName{parameter}
 }
 %
-The types system builds on a collection of basic types, which include
+The type system builds on a collection of basic types, which include
 predefined numbers and booleans as well as the type \prog{Symbol}, which is the
-type for all symbol values (\nt{Name}). The predefined symbol values \prog{A}
-and \prog{B} also have the more specific type \prog{Player}. The special type
-\prog{Input} is a synonym for the type of information that is gathered from the
-user in each move during an execution of the game.
+type for all symbol values (\nt{Name}).
 %
-Basic types also include types specific to the domain of board games. Among
-those, the type \prog{Position} is a synonym for \prog{(Int,Int)}. The type
-\prog{Positions} is an abstract data type for collections of positions, which
-can be though of as sets or lists of positions. However, the underlying
-representation is not exposed to the programmer. A value of type
-\prog{Positions} can only be generated and manipulated by a number of
-predefined operations.
+% The predefined symbol values \prog{A} and \prog{B} also have the more specific type \prog{Player}.
+%
+The special type \prog{Input} is a synonym for the type of information that is
+gathered from the user in each move during an execution of the game.
+%
+% Basic types also include types specific to the domain of board games. Among
+% those, the type \prog{Position} is a synonym for \prog{(Int,Int)}. The type
+% \prog{Positions} is an abstract data type for collections of positions, which
+% can be though of as sets or lists of positions. However, the underlying
+% representation is not exposed to the programmer. A value of type
+% \prog{Positions} can only be generated and manipulated by a number of
+% predefined operations.
 
-Extended types extend a base type by one or more symbols, which are values and
-can be thought of nullary data constructors. For example, the Haskell type
-\prog{Maybe Int} can be represented by the extended type \prog{Int|Nothing}.
-Extended types facilitate the extension of types by values for representing
-``special'' situations. For example, \prog{Player|Empty} is a type typically
-used in a board type definition.
+An enumeration type is given by a set of symbols, and an  extended type adds to
+a base type one or more symbols, which are values and can be thought of nullary
+data constructors. For example, the Haskell type \prog{Maybe Int} can be
+represented by the extended type \prog{Int~\&~\{Nothing\}}. Extended types
+facilitate the extension of types by values for representing ``special''
+situations. For example, \prog{Player~\&~\{Empty\}} is a type typically used in
+a board type definition.
 
 A tuple type can contain extended types, and a plain type is either a tuple
 type or an extended type. The language has first-order function types whose
@@ -137,28 +141,31 @@ argument and result types can be any plain type.
 
 \syntax{Types}{
 \nt{btype}    \IS  \prog{Bool} \ORil \prog{Int} \ORil
-                   \prog{Symbol} \ORil \prog{Input} \ORil \prog{Void}
-                                                         \prodName{atomic type}
-              \OR  \prog{Board} \ORil \prog{Player} \ORil
-                   \prog{Position} \ORil \prog{Positions}
-                                                           \prodName{game type}
-\nt{xtype}    \IS  \nt{btype}(\prog{|}\nt{Name})^*
+                   \prog{Symbol} \ORil \prog{Input}
+                   % \ORil \prog{Void}
+                                                         \prodName{base type}
+              % \OR  \prog{Board} \ORil \prog{Player} \ORil
+              %      \prog{Position} \ORil \prog{Positions}
+              %                                              \prodName{game type}
+\nt{etype}    \IS  \prog{\{}\nt{Name}_1\prog{,}\ \ldots\prog{,}\ \nt{Name}_k \prog{\}}               \prodName{enumeration type}
+\nt{xtype}    \IS  \nt{btype} \ORil \nt{xtype}\ \prog{\&}\ \nt{etype}
                                                        \prodName{extended type}
-\nt{ttype}    \IS  \paren{\nt{xtype}_1\prog{,}\ \ldots\ \prog{,}\nt{xtype}_k}
+\nt{ttype}    \IS  \paren{\nt{xtype}_1\prog{,}\ \ldots\prog{,}\ \nt{xtype}_k}
                                                \prodName{tuple type, $k\geq 2$}
 \nt{ptype}     \IS  \nt{xtype} \ORil \nt{ttype}
                                                           \prodName{plain type}
 \nt{ftype}    \IS  \nt{ptype}\ \prog{->}\ \nt{ptype}   \prodName{function type}
-\nt{type}     \IS  \nt{ptype} \ORil \nt{ftype}
-                                                                \prodName{type}
+\nt{type}     \IS  \nt{ptype} \ORil \nt{ftype}                  \prodName{type}
 }
 %
-Atomic expressions are either basic integer or string values or symbols. Note
-that symbols include the predefined values \prog{A} and \prog{B} of type
-\prog{Player} plus a number of predefined operations.
+Atomic expressions are either basic integer values or symbols. \prog{True} and
+\prog{False} are symbols of type \prog{Bool}, all other symbols have either the
+type \prog{Symbol} or the type of the type definition they occur in. For
+example, the type definition \prog{type~Player~=~\{A,B\}} that occurs in the
+BoGL prelude defines \prog{A} and \prog{B} to be symbols of type \prog{Player}.
 %
-Not that the case for infix application includes the Haskell notation for array
-lookup \prog{board!(x,y)}.
+Note that the case for infix application includes the Haskell notation for
+array lookup \prog{board!(x,y)}.
 
 \syntax{Expressions}{
 \nt{expr}     \IS  \nt{int}                                 \prodName{integer}
@@ -197,26 +204,26 @@ lookup \prog{board!(x,y)}.
 %                  \prodName{redefinable operations}
 % }
 %
-Here are several predefined operations and values and their types. This list is preliminary and is likely to change.
-
-\begin{verbatim}
--- User input
-input : Input
-
--- Board and Player updates
-place : (Symbol,Board,Position) -> Board
-next  : Player -> Player
-
--- Board predicates
-free   : Board -> Positions
-isFull : Board -> Bool
-isFull(b) = countBoard(Empty,b) == 0
-
-inARow      : (Int,Symbol,Board) -> Bool
-countBoard  : (Symbol,Board) -> Int
-countRow    : (Symbol,Board,Int) -> Int
-countColumn : (Symbol,Board,Int) -> Int
-\end{verbatim}
+% Here are several predefined operations and values and their types. This list is preliminary and is likely to change.
+%
+% \begin{verbatim}
+% -- User input
+% input : Input
+%
+% -- Board and Player updates
+% place : (Symbol,Board,Position) -> Board
+% next  : Player -> Player
+%
+% -- Board predicates
+% free   : Board -> Positions
+% isFull : Board -> Bool
+% isFull(b) = countBoard(Empty,b) == 0
+%
+% inARow      : (Int,Symbol,Board) -> Bool
+% countBoard  : (Symbol,Board) -> Int
+% countRow    : (Symbol,Board,Int) -> Int
+% countColumn : (Symbol,Board,Int) -> Int
+% \end{verbatim}
 
 
 % \syntax{Auxiliary Definitions}{
