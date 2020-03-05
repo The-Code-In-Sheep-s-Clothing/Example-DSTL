@@ -66,16 +66,22 @@ The nonterminal \nt{int} stands for integer constants.
 %
 Comments are also handled as in Haskell.
 
-A game definition consists of a name, two mandatory type definitions for the
-board and player inputs, any number of additional type definitions, followed by
-any number of value and function definitions.
+Unlike Haskell, we require all names (of values and types) to be defined before
+they can be used in other definitions.
+
+A game definition consists of a name, a number of type definitions, followed by
+any number of value and function definitions. The type definitions must include
+a definition for a board and an input type.
 %
 The board definition determines the board dimensions and the type of values
 that can appear on a board.
 
 \syntax{Games and Type Definitions}{
-\nt{game}    \IS  \prog{game}\ \nt{Name}\ \nt{board}\ \nt{input}
-                  \ \nt{typedef}^*\ \nt{valuedef}^*
+\nt{game}    \IS  \prog{game}\ \nt{Name}
+                  \ \nt{typedef}^*
+                  \ \nt{board}\ \nt{input}
+                  \ \nt{typedef}^*
+                  \ \nt{valuedef}^*
                                                      \prodName{game definition}
 \nt{board}   \IS  \prog{type Board = Array }\pair{\nt{int}}{\nt{int}}\
                   \prog{of}\ \nt{type}                \prodName{board type}
@@ -135,22 +141,27 @@ facilitate the extension of types by values for representing ``special''
 situations. For example, \prog{Player~\&~\{Empty\}} is a type typically used in
 a board type definition.
 
+To avoid ambiguities and to simplify type checking we require that a symbol can
+be used only in one enumeration type. The type of a symbol \prog{A} used in a
+definition \prog{type~T~=~U~\&~\{...,A~,...\}} should be \prog{T}.
+
 A tuple type can contain extended types, and a plain type is either a tuple
 type or an extended type. The language has first-order function types whose
 argument and result types can be any plain type.
 
 \syntax{Types}{
-\nt{btype}    \IS  \prog{Bool} \ORil \prog{Int} \ORil
-                   \prog{Symbol} \ORil \prog{Input}
+\nt{btype}    \IS  \prog{Bool} \ORil \prog{Int} \ORil \prog{Input}
+                   % \prog{Symbol} \ORil \prog{Input}
                    % \ORil \prog{Void}
                                                          \prodName{base type}
               % \OR  \prog{Board} \ORil \prog{Player} \ORil
               %      \prog{Position} \ORil \prog{Positions}
               %                                              \prodName{game type}
 \nt{etype}    \IS  \prog{\{}\nt{Name}_1\prog{,}\ \ldots\prog{,}\ \nt{Name}_k \prog{\}}               \prodName{enumeration type}
-\nt{xtype}    \IS  \nt{btype} \ORil \nt{xtype}\ \prog{\&}\ \nt{etype}
+\nt{xtype}    \IS  \nt{btype} \ORil \nt{etype} \ORil
+                   \nt{xtype}\ \prog{\&}\ \nt{etype}
                                                        \prodName{extended type}
-\nt{ttype}    \IS  \paren{\nt{xtype}_1\prog{,}\ \ldots\prog{,}\ \nt{xtype}_k}
+\nt{ttype}    \IS  \paren{\nt{ptype}_1\prog{,}\ \ldots\prog{,}\ \nt{ptype}_k}
                                                \prodName{tuple type, $k\geq 2$}
 \nt{ptype}     \IS  \nt{xtype} \ORil \nt{ttype}
                                                           \prodName{plain type}
