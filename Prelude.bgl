@@ -15,8 +15,7 @@ goFirst : Player
 goFirst = A
 
 next : Player -> Player
-next(A) = B
-next(B) = A
+next(p) = if p == A then B else A
 
 
 -- Initial board and board operations

@@ -8,6 +8,24 @@
 \renewcommand\ttdefault{cmtt}
 
 
+% Program environment
+%
+\usepackage{fancyvrb}
+\newcommand{\progind}{\parindent}
+\newcommand{\progformat}{\tt}
+\newcommand{\progfontsize}{\small}
+% \renewcommand{\progfontsize}{\footnotesize}
+\DefineVerbatimEnvironment{program}{Verbatim}
+   {xleftmargin=\progind,fontsize=\progfontsize,formatcom=\progformat,
+    commandchars=\\\{\},samepage=true}
+\DefineVerbatimEnvironment{programPageBreak}{Verbatim}
+   {xleftmargin=\progind,fontsize=\progfontsize,formatcom=\progformat,
+    commandchars=\\\{\}}
+\DefineVerbatimEnvironment{programNoCmdChr}{Verbatim}
+   {baselinestretch=1.0,xleftmargin=\progind,fontsize=\progfontsize,
+    samepage=true}
+
+
 % layout
 %
 \usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry}
@@ -78,7 +96,30 @@ any number of value and function definitions. The type definitions must include
 a definition for a board and an input type.
 %
 The board definition determines the board dimensions and the type of values
-that can appear on a board.
+that can appear on a board. This type of board contents is given the type name
+\prog{Piece}. Specifically, a user program that contains the  following type
+definition:
+
+\begin{program}
+type Board = Array (n,m) of T
+\end{program}
+%
+can be thought of as syntactic sugar for, and is thus equivalent to, the
+following two definitions:
+
+\begin{program}
+type Piece = T
+type Board = Array (n,m) of Piece
+\end{program}
+%
+This definition allows us to assign the following type to the built-in function
+place.
+
+\begin{program}
+place : (Piece,Board,Position) -> Board
+\end{program}
+%
+% With this we can place integers and booleans and tuples, etc. on the board in a type-safe manner.
 
 \syntax{Games and Type Definitions}{
 \nt{game}    \IS  \prog{game}\ \nt{Name}
@@ -89,7 +130,7 @@ that can appear on a board.
                                                      \prodName{game definition}
 % \nt{content} \IS  \prog{type Content = }\nt{type}      \prodName{input type}
 \nt{board}   \IS  \prog{type Board = Array }\pair{\nt{int}}{\nt{int}}\
-                  \prog{of}\ \nt{type}                \prodName{board type}
+                  \prog{of}\ \nt{ptype}                \prodName{board type}
 \nt{input}   \IS  \prog{type Input = }\nt{type}      \prodName{input type}
 \nt{typedef} \IS  \prog{type }\nt{Name}\prog{ = }\nt{type}      \prodName{type definition}
 }
@@ -235,20 +276,20 @@ The same remark applies to the \prog{Symbol} type argument of the functions
 %
 \end{itemize}
 
-\begin{verbatim}
+\begin{program}
 type Position = (Int,Int)
 
 input       : Input
-place       : (Symbol,Board,Position) -> Board
+place       : (Piece,Board,Position) -> Board
 inARow      : (Int,Symbol,Board) -> Bool
 countBoard  : (Symbol,Board) -> Int
 countRow    : (Symbol,Board,Int) -> Int
 countColumn : (Symbol,Board,Int) -> Int
-\end{verbatim}
+\end{program}
 %
 Here is the default content of the file \prog{Prelude.bgl}.
 
-\begin{verbatim}
+\begin{programPageBreak}
 -- Game types
 --
 type Player = {A,B}
@@ -261,8 +302,7 @@ goFirst : Player
 goFirst = A
 
 next : Player -> Player
-next(A) = B
-next(B) = A
+next(p) = if p == A then B else A
 
 
 -- Initial board and board operations
@@ -283,12 +323,12 @@ tryMove : State -> State
 tryMove(b,p) = let pos = input in
                    if isValid(b,pos) then (place(p,b,pos),next(p))
                                      else (b,p)
-\end{verbatim}
+\end{programPageBreak}
 
 \end{document}
 
 
-\begin{verbatim}
+\begin{programPageBreak}
 --
 -- BoGL general definitions
 --
@@ -328,4 +368,4 @@ tryMove : State -> State
 tryMove(b,p) = let pos = input in
                    if isValid(b,pos) then (place(p,b,pos),next(p))
                                      else (b,p)
-\end{verbatim}
+\end{programPageBreak}
