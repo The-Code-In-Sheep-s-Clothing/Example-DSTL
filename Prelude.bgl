@@ -1,7 +1,11 @@
 --
--- General game definitions
+-- BoGL general definitions
 --
-type Player = Void | A | B
+
+
+-- Game types
+--
+type Player = {A,B}
 type State = (Board,Player)
 
 
@@ -23,6 +27,9 @@ initialBoard(x,y) = Empty
 isValid : (Board,Position) -> Bool
 isValid(b,p) = if b!p == Empty then True else False
 
+isFull : Board -> Bool
+isFull(b) = countBoard(Empty,b) == 0
+
 
 -- Game state operations
 --
@@ -30,9 +37,3 @@ tryMove : State -> State
 tryMove(b,p) = let pos = input in
                    if isValid(b,pos) then (place(p,b,pos),next(p))
                                      else (b,p)
-
-loop : State -> State
-loop(p,b) = while not(gameOver(b)) do tryMove(p,b)
-
-play : State -> Player|Tie
-play(a,b) = outcome(loop(a,b))

@@ -17,6 +17,10 @@
 \raggedbottom
 \sloppypar
 \usepackage{needspace}
+\def\denseitems{
+  \itemsep1pt plus1pt minus1pt
+  \parsep0pt plus0pt
+  \parskip0pt\topsep0pt}
 
 
 
@@ -83,6 +87,7 @@ that can appear on a board.
                   \ \nt{typedef}^*
                   \ \nt{valuedef}^*
                                                      \prodName{game definition}
+% \nt{content} \IS  \prog{type Content = }\nt{type}      \prodName{input type}
 \nt{board}   \IS  \prog{type Board = Array }\pair{\nt{int}}{\nt{int}}\
                   \prog{of}\ \nt{type}                \prodName{board type}
 \nt{input}   \IS  \prog{type Input = }\nt{type}      \prodName{input type}
@@ -142,8 +147,7 @@ situations. For example, \prog{Player~\&~\{Empty\}} is a type typically used in
 a board type definition.
 
 To avoid ambiguities and to simplify type checking we require that a symbol can
-be used only in one enumeration type. The type of a symbol \prog{A} used in a
-definition \prog{type~T~=~U~\&~\{...,A~,...\}} should be \prog{T}.
+be used only in one enumeration type. The type of a symbol \prog{A} used in a definition \prog{type~T~=~U~\&~\{...,A,...\}} is \prog{T}.
 
 A tuple type can contain extended types, and a plain type is either a tuple
 type or an extended type. The language has first-order function types whose
@@ -206,41 +210,122 @@ array lookup \prog{board!(x,y)}.
                                                    \prodName{binary operation}
 }
 %
-% The following may not be needed for the syntax.
+Here is a list of \emph{required built-in} types and functions.
 %
-% \syntax{Predefined Operation Names}{
-% \nt{predef} \IS  \prog{INPUT} \ORil \nt{redef}
-%                  \prodName{predefined operations}
-% \nt{redef}  \IS  \prog{gameOver} \ORil\ \prog{isValid}
-%                  \prodName{redefinable operations}
-% }
+Note the following.
 %
-% Here are several predefined operations and values and their types. This list is preliminary and is likely to change.
+\begin{itemize}\denseitems
 %
-% \begin{verbatim}
-% -- User input
-% input : Input
+\item The type definition for \prog{Position} is for convenience; it allows us
+to give the shown type for the function \prog{place}. An implementation could
+omit this definition and instead use \prog{(Int,Int)}.
 %
-% -- Board and Player updates
-% place : (Symbol,Board,Position) -> Board
-% next  : Player -> Player
+\item Despite its type, \prog{input} is a function that triggers user-input
+requests and returns the values given by the user, which have to be of type
+\prog{Input}, which is a user defined type.
 %
-% -- Board predicates
-% free   : Board -> Positions
-% isFull : Board -> Bool
-% isFull(b) = countBoard(Empty,b) == 0
+\item The first argument type of the function \prog{place} is \prog{Symbol},
+which is imprecise (it's a sloppy approach to model a form of ad hoc
+polymorphism). The type checker should make sure that \prog{place} receives as
+first arguments only values of the same type that has been used in the type
+definition for \prog{Board}.
 %
-% inARow      : (Int,Symbol,Board) -> Bool
-% countBoard  : (Symbol,Board) -> Int
-% countRow    : (Symbol,Board,Int) -> Int
-% countColumn : (Symbol,Board,Int) -> Int
-% \end{verbatim}
+The same remark applies to the \prog{Symbol} type argument of the functions
+\prog{inARow}, \prog{countBoard}, \prog{countRow}, and \prog{countColumn}.
+%
+\end{itemize}
+
+\begin{verbatim}
+type Position = (Int,Int)
+
+input       : Input
+place       : (Symbol,Board,Position) -> Board
+inARow      : (Int,Symbol,Board) -> Bool
+countBoard  : (Symbol,Board) -> Int
+countRow    : (Symbol,Board,Int) -> Int
+countColumn : (Symbol,Board,Int) -> Int
+\end{verbatim}
+%
+Here is the default content of the file \prog{Prelude.bgl}.
+
+\begin{verbatim}
+-- Game types
+--
+type Player = {A,B}
+type State = (Board,Player)
 
 
-% \syntax{Auxiliary Definitions}{
-% \nt{parlist} \IS \paren{\nt{name}_1\prog{,}\ \ldots\ \prog{,}\nt{name}_k}
-%                  \prodName{parameter list, $k>1$}
-% }
+-- Players
+--
+goFirst : Player
+goFirst = A
 
+next : Player -> Player
+next(A) = B
+next(B) = A
+
+
+-- Initial board and board operations
+--
+initialBoard : Board
+initialBoard(x,y) = Empty
+
+isValid : (Board,Position) -> Bool
+isValid(b,p) = if b!p == Empty then True else False
+
+isFull : Board -> Bool
+isFull(b) = countBoard(Empty,b) == 0
+
+
+-- Game state operations
+--
+tryMove : State -> State
+tryMove(b,p) = let pos = input in
+                   if isValid(b,pos) then (place(p,b,pos),next(p))
+                                     else (b,p)
+\end{verbatim}
 
 \end{document}
+
+
+\begin{verbatim}
+--
+-- BoGL general definitions
+--
+
+
+-- Game types
+--
+type Player = {A,B}
+type State = (Board,Player)
+
+
+-- Players
+--
+goFirst : Player
+goFirst = A
+
+next : Player -> Player
+next(A) = B
+next(B) = A
+
+
+-- Initial board and board operations
+--
+initialBoard : Board
+initialBoard(x,y) = Empty
+
+isValid : (Board,Position) -> Bool
+isValid(b,p) = if b!p == Empty then True else False
+
+isFull : Board -> Bool
+isFull(b) = countBoard(Empty,b) == 0
+
+
+-- Game state operations
+--
+tryMove : State -> State
+tryMove(b,p) = let pos = input in
+                   if isValid(b,pos) then (place(p,b,pos),next(p))
+                                     else (b,p)
+\end{verbatim}
